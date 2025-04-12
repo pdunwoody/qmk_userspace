@@ -1,0 +1,11 @@
+#pragma once
+
+#define CHORDAL_HOLD
+
+#define PERMISSIVE_HOLD
+#define TAPPING_TERM 200
+
+#define SPLIT_LAYER_STATE_ENABLE
+#define SPLIT_LED_STATE_ENABLE
+
+#define DYNAMIC_KEYMAP_LAYER_COUNT 8

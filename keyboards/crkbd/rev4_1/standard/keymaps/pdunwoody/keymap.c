@@ -3,6 +3,23 @@
 #    include "keymap.h"
 #endif
 
+enum custom_keycodes {
+    MICMUTE = SAFE_RANGE,
+};
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+    case MICMUTE:
+        if (record->event.pressed) {
+            // when keycode MICMUTE is pressed
+            SEND_STRING(SS_LGUI(SS_LALT("k")));
+        } else {
+            // when keycode MICMUTE is released
+        }
+        break;
+    }
+    return true;
+};
 
  const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM =
     LAYOUT_split_3x6_3_ex2(
@@ -13,7 +30,7 @@
     );
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    [0] = LAYOUT_split_3x6_3_ex2(KC_LCTL, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_VOLD, KC_VOLU, KC_Y, KC_U, KC_I, KC_O, KC_P, TG(7), KC_LSFT, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G, KC_MPLY, KC_NO, KC_H, RSFT_T(KC_J), RCTL_T(KC_K), RALT_T(KC_L), RGUI_T(KC_SCLN), KC_QUOT, KC_LALT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_NO, LT(3,KC_ESC), LT(1,KC_SPC), LT(2,KC_TAB), LT(5,KC_ENT), LT(4,KC_BSPC), LT(6,KC_DEL)),
+    [0] = LAYOUT_split_3x6_3_ex2(KC_LCTL, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_VOLD, KC_VOLU, KC_Y, KC_U, KC_I, KC_O, KC_P, TG(7), KC_LSFT, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G, KC_MPLY, MICMUTE, KC_H, RSFT_T(KC_J), RCTL_T(KC_K), RALT_T(KC_L), RGUI_T(KC_SCLN), KC_QUOT, KC_LALT, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_NO, LT(3,KC_ESC), LT(1,KC_SPC), LT(2,KC_TAB), LT(5,KC_ENT), LT(4,KC_BSPC), LT(6,KC_DEL)),
     [1] = LAYOUT_split_3x6_3_ex2(KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_GRV, KC_7, KC_8, KC_9, KC_LPRN, KC_RPRN, KC_TRNS, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, QK_LLCK, KC_TRNS, KC_TRNS, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_NO, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_PSLS, KC_1, KC_2, KC_3, KC_PEQL, KC_NO, KC_NO, KC_NO, KC_NO, KC_MINS, KC_0, KC_DOT),
     [2] = LAYOUT_split_3x6_3_ex2(KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_TILD, KC_AMPR, KC_ASTR, KC_LPRN, KC_LCBR, KC_RCBR, KC_TRNS, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, QK_LLCK, KC_TRNS, KC_TRNS, KC_NO, KC_DLR, KC_PERC, KC_CIRC, KC_LBRC, KC_RBRC, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_EXLM, KC_AT, KC_HASH, KC_BSLS, KC_PIPE, KC_NO, KC_NO, KC_NO, KC_UNDS, KC_LPRN, KC_RPRN),
     [3] = LAYOUT_split_3x6_3_ex2(KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_TRNS, KC_TRNS, KC_PSCR, KC_F7, KC_F8, KC_F9, KC_F12, KC_TRNS, KC_TRNS, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, QK_LLCK, KC_TRNS, KC_TRNS, KC_SCRL, KC_F4, KC_F5, KC_F6, KC_F11, KC_TRNS, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_PAUS, KC_F1, KC_F2, KC_F3, KC_F10, KC_TRNS, KC_NO, KC_NO, KC_NO, KC_ENT, KC_BSPC, KC_DEL),
