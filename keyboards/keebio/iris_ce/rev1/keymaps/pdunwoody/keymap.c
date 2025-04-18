@@ -18,6 +18,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         case CW_TOGG:
+            static uint16_t registered_key = KC_NO;
             if (record->event.pressed) {  // On key press.
                 const uint8_t mods = get_mods();
                 uint8_t shift_mods = mods & MOD_MASK_SHIFT;
@@ -107,7 +108,6 @@ bool rgb_matrix_indicators_advancedm_user(uint8_t led_min, uint8_t led_max) {
                     }
 
                 }
-                if (layer = )
             }
         }
     }
@@ -129,3 +129,15 @@ bool rgb_matrix_indicators_advancedm_user(uint8_t led_min, uint8_t led_max) {
     }
     return false;
 }
+
+void keyboard_post_init_user(void) {
+    // Set the effect.
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_PALETTEFX_FLOW);
+    // Set the palette and maximize saturation and brightness.
+    uint8_t palette_index = PALETTEFX_CARNIVAL;  // Set Carnival palette.
+    rgb_matrix_sethsv_noeeprom(RGB_MATRIX_HUE_STEP * palette_index, 255, 255);
+    // Set speed to default.
+    rgb_matrix_set_speed_noeeprom(128);
+    // Make sure RGB Matrix is on.
+    rgb_matrix_enable_noeeprom();
+  }

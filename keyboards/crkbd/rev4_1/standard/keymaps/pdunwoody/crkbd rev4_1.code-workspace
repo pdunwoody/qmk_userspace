@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../../../../../qmk_firmware_wsl/keyboards/crkbd"
+		}
+	],
+	"settings": {}
+}
