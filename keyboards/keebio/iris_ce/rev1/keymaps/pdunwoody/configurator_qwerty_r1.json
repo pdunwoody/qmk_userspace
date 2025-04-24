@@ -65,7 +65,7 @@
       "LT(6,KC_DEL)"
     ],
     [
-      "KC_NO",
+      "KC_GRV",
       "KC_NO",
       "KC_NO",
       "KC_NO",
@@ -83,7 +83,7 @@
       "KC_LBRC",
       "KC_RBRC",
       "KC_TILD",
-      "KC_GRV",
+      "KC_UNDS",
       "KC_7",
       "KC_8",
       "KC_9",
@@ -239,7 +239,7 @@
       "KC_TRNS"
     ],
     [
-      "KC_NO",
+      "KC_GRV",
       "KC_NO",
       "KC_NO",
       "KC_NO",
@@ -257,7 +257,7 @@
       "KC_LBRC",
       "KC_RBRC",
       "KC_TILD",
-      "KC_GRV",
+      "KC_UNDS",
       "KC_7",
       "KC_8",
       "KC_9",
@@ -268,7 +268,7 @@
       "KC_DLR",
       "KC_LPRN",
       "KC_RPRN",
-      "KC_EQL",
+      "EE_CLR",
       "KC_MINS",
       "LSFT_T(KC_4)",
       "LCTL_T(KC_5)",
@@ -291,7 +291,7 @@
       "KC_NO",
       "KC_NO",
       "KC_NO",
-      "KC_NO",
+      "KC_EQL",
       "KC_NO",
       "KC_0",
       "KC_DOT"
@@ -326,7 +326,7 @@
       "KC_DOWN",
       "KC_UP",
       "KC_RGHT",
-      "KC_NO",
+      "CW_TOGG",
       "EE_CLR",
       "KC_RSFT",
       "KC_RCTL",
