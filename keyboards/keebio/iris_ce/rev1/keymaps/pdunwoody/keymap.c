@@ -9,7 +9,7 @@ enum custom_keycodes {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case MICMUTE:
+        case MICMUTE: {
             if (record->event.pressed) {
                 // when keycode MICMUTE is pressed
                 SEND_STRING(SS_LGUI(SS_LALT("k")));
@@ -17,7 +17,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 // when keycode MICMUTE is released
             }
             break;
-        case CW_TOGG:
+        }
+        case CW_TOGG: {
             static uint16_t registered_key = KC_NO;
             if (record->event.pressed) {  // On key press.
                 const uint8_t mods = get_mods();
@@ -39,6 +40,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 unregister_code(registered_key);
             }
             break;
+        }
     }
     return true;
 };
