@@ -1,8 +1,8 @@
 # Build Options
 #   change yes to no to disable
 #
-MCU = RP2040
-BOOTLOADER = rp2040
+MCU = atmega32u4
+BOOTLOADER = caterina
 # CONVERT_TO = promicro_rp2040
 
 BOOTMAGIC_ENABLE = yes      # Enable Bootmagic Lite
