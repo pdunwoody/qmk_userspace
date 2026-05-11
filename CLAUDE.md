@@ -86,7 +86,7 @@ All three keyboards share the same 8-layer structure and custom keycode logic. W
 |---|---|
 | 1 `_NUMBERS` | Yellow (255, 200, 0) |
 | 2 `_EXTRA` | Magenta (255, 0, 200) |
-| 3 `_FUNCTION` | Orange (255, 80, 0) |
+| 3 `_FUNCTION` | Blue (0, 0, 255) |
 | 4 `_SYMBOLS` | Yellow (255, 200, 0) — same as `_NUMBERS` |
 | 5 `_NAVIGATION` | Cyan (0, 200, 255) |
 | 6 `_MEDIA` | Green (0, 255, 80) |

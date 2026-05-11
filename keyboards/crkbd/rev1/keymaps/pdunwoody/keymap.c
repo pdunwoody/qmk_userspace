@@ -114,7 +114,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     static const uint8_t layer_colors[][3] = {
         [_NUMBERS]    = {255, 200,   0},
         [_EXTRA]      = {255,   0, 200},
-        [_FUNCTION]   = {255,  80,   0},
+        [_FUNCTION]   = {  0,   0, 255},
         [_SYMBOLS]    = {255, 200,   0},
         [_NAVIGATION] = {  0, 200, 255},
         [_MEDIA]      = {  0, 255,  80},
