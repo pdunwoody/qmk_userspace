@@ -2,7 +2,7 @@
 
 #define CHORDAL_HOLD
 
-#define PERMISSIVE_HOLD
+//#define PERMISSIVE_HOLD
 #define TAPPING_TERM 200
 
 #define SPLIT_LAYER_STATE_ENABLE

@@ -71,7 +71,7 @@ All three keyboards share the same 8-layer structure and custom keycode logic. W
 - Left: `LGUI_T(A)`, `LALT_T(S)`, `LCTL_T(D)`, `LSFT_T(F)`
 - Right: `RSFT_T(J)`, `RCTL_T(K)`, `RALT_T(L)`, `RGUI_T(;)`
 
-`CHORDAL_HOLD` and `PERMISSIVE_HOLD` are enabled in `config.h` to make home row mods reliable. `chordal_hold_layout` defines left-hand (`'L'`) vs right-hand (`'R'`) key zones so opposite-hand chords resolve immediately without waiting for `TAPPING_TERM` (250ms).
+`CHORDAL_HOLD` is enabled in `config.h` to make home row mods reliable. `chordal_hold_layout` defines left-hand (`'L'`) vs right-hand (`'R'`) key zones.
 
 ### Custom Keycodes
 
@@ -80,18 +80,18 @@ All three keyboards share the same 8-layer structure and custom keycode logic. W
 
 ### RGB Layer Indicators
 
-`rgb_matrix_indicators_advanced_user` in each `keymap.c` lights active keys per layer with Solarized palette colors:
+`rgb_matrix_indicators_advanced_user` in each `keymap.c` lights active keys per layer using a compile-time lookup table (`layer_colors`) indexed by layer enum value. Layers 1 and 4 share the same color intentionally.
 
 | Layer | Color (RGB) |
 |---|---|
-| 1 `_NUMBERS` | Red (220, 50, 47) |
-| 2 `_EXTRA` | Magenta (211, 54, 130) |
-| 3 `_FUNCTION` | Orange (203, 75, 22) |
-| 4 `_SYMBOLS` | Blue (38, 139, 210) |
-| 5 `_NAVIGATION` | Violet (108, 113, 196) |
-| 6 `_MEDIA` | Teal (42, 161, 152) |
+| 1 `_NUMBERS` | Yellow (255, 200, 0) |
+| 2 `_EXTRA` | Magenta (255, 0, 200) |
+| 3 `_FUNCTION` | Orange (255, 80, 0) |
+| 4 `_SYMBOLS` | Yellow (255, 200, 0) — same as `_NUMBERS` |
+| 5 `_NAVIGATION` | Cyan (0, 200, 255) |
+| 6 `_MEDIA` | Green (0, 255, 80) |
 
-Caps Lock / Caps Word active on `_BASE`: Gold (181, 137, 0) on all non-transparent keys.
+Caps Lock / Caps Word active on `_BASE`: Gold (255, 180, 0) on all non-transparent keys.
 
 ## Per-Keyboard Differences
 
