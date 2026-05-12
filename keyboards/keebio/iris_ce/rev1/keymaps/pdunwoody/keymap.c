@@ -154,5 +154,24 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             }
         }
     }
+
+    uint8_t mods = get_mods();
+    if (mods) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+            for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                uint8_t index = g_led_config.matrix_co[row][col];
+                if (index < led_min || index >= led_max || index == NO_LED) continue;
+                uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                bool light = false;
+                if ((mods & MOD_MASK_SHIFT) && (kc == KC_S || kc == KC_H || kc == KC_F || kc == KC_T)) light = true;
+                if ((mods & MOD_MASK_ALT)   && (kc == KC_A || kc == KC_L || kc == KC_T))               light = true;
+                if ((mods & MOD_MASK_CTRL)  && (kc == KC_C || kc == KC_T || kc == KC_R || kc == KC_L)) light = true;
+                if ((mods & MOD_MASK_GUI)   && (kc == KC_W || kc == KC_I || kc == KC_N))               light = true;
+                if (light) rgb_matrix_set_color(index, 255, 255, 255);
+            }
+        }
+    }
     return false;
 }
