@@ -99,9 +99,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, RCTL(KC_V), RCTL(KC_C), RCTL(KC_X), RCTL(KC_Z), KC_NO,
         KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO),
     [_MEDIA] = LAYOUT_split_3x6_3(
-        KC_NO, RGB_M_VAI, RGB_M_SAI, RGB_M_HUI, RGB_M_MOD, RGB_M_SPI, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
-        KC_NO, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT, RGB_M_TOG, QK_LLCK, KC_RSFT, KC_RCTL, KC_RALT, KC_RGUI, KC_NO,
-        KC_NO, RGB_M_VAD, RGB_M_SAD, RGB_M_HUD, RGB_M_RMOD, RGB_M_SPD, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, RM_VALU, RM_SATU, RM_HUEU, RM_NEXT, RM_SPDU, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
+        KC_NO, KC_MPRV, KC_VOLD, KC_VOLU, KC_MNXT, RM_TOGG, QK_LLCK, KC_RSFT, KC_RCTL, KC_RALT, KC_RGUI, KC_NO,
+        KC_NO, RM_VALD, RM_SATD, RM_HUED, RM_PREV, RM_SPDD, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,
         KC_MUTE, KC_NO, KC_MSTP, KC_NO, KC_NO, KC_NO),
     [_QWERTY] = LAYOUT_split_3x6_3(
         KC_GRV, KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, KC_NO,
@@ -161,6 +161,22 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 if ((mods & MOD_MASK_CTRL)  && (kc == KC_C || kc == KC_T || kc == KC_R || kc == KC_L)) light = true;
                 if ((mods & MOD_MASK_GUI)   && (kc == KC_W || kc == KC_I || kc == KC_N))               light = true;
                 if (light) rgb_matrix_set_color(index, 255, 255, 255);
+            }
+        }
+    }
+
+    if (layer == _QWERTY) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+            for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                uint8_t index = g_led_config.matrix_co[row][col];
+                if (index < led_min || index >= led_max || index == NO_LED) continue;
+                uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                bool is_toggle = IS_QK_TOGGLE_LAYER(kc) && QK_TOGGLE_LAYER_GET_LAYER(kc) == _QWERTY;
+                if (kc == KC_W || kc == KC_A || kc == KC_S || kc == KC_D || is_toggle) {
+                    rgb_matrix_set_color(index, 0, 255, 80);
+                }
             }
         }
     }

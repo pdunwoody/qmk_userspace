@@ -32,18 +32,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SPLIT_LAYER_STATE_ENABLE
 #define SPLIT_LED_STATE_ENABLE
+#define SPLIT_MODS_ENABLE
 
-//#define MASTER_RIGHT
-#define SPLIT_HAND_PIN GP21
-#define	SPLIT_HAND_PIN_LOW_IS_LEFT
-#define USE_SERIAL
 #define SERIAL_PIO_USE_PIO0
-#define SERIAL_USART_TX_PIN   GP1
-#define USB_VBUS_PIN 19
 
 /* Reset. */
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
-#define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP17
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_TIMEOUT 1000U
 
 #ifdef RGBLIGHT_ENABLE
@@ -65,30 +59,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #ifdef OLED_ENABLE
-// settings for the oled keyboard demo with Adafruit 0.91" OLED display on the Stemma QT port
     #define OLED_DISPLAY_128X32
-    #define I2C_DRIVER I2CD1
-    #define I2C1_SDA_PIN GP2
-    #define I2C1_SCL_PIN GP3
     #define OLED_BRIGHTNESS 180
     #define OLED_TIMEOUT 60000
-//    #define OLED_FONT_H "lib/glcdfont.c"
-    // #define WPM_ESTIMATED_WORD_SIZE 5
-    #define SPLIT_LAYER_STATE_ENABLE
-    #define SPLIT_LED_STATE_ENABLE
-    #define SPLIT_MODS_ENABLE
     #define SPLIT_WPM_ENABLE
-    // #define SPLIT_OLED_ENABLE              // 不要打开 打开之后副手OLED就不亮了
 #endif
 
 #ifdef RGB_MATRIX_ENABLE
-    #define RGB_MATRIX_LED_COUNT          54 // Number of LEDs
-    #define DRIVER_LED_TOTAL              RGBLED_NUM
+    #define RGB_MATRIX_LED_COUNT          54
     #define RGB_MATRIX_SPLIT              { 27, 27 }
-    #ifdef WS2812_DI_PIN
-        #undef WS2812_DI_PIN
-    #endif
-    #define WS2812_DI_PIN                 GP0
     #define WS2812_PIO_USE_PIO1
 
     #define SPLIT_TRANSPORT_MIRROR

@@ -164,6 +164,22 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             }
         }
     }
+
+    if (layer == _QWERTY) {
+        for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+            for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                uint8_t index = g_led_config.matrix_co[row][col];
+                if (index < led_min || index >= led_max || index == NO_LED) continue;
+                uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                bool is_toggle = IS_QK_TOGGLE_LAYER(kc) && QK_TOGGLE_LAYER_GET_LAYER(kc) == _QWERTY;
+                if (kc == KC_W || kc == KC_A || kc == KC_S || kc == KC_D || is_toggle) {
+                    rgb_matrix_set_color(index, 0, 255, 80);
+                }
+            }
+        }
+    }
     return false;
 }
 

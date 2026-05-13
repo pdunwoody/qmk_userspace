@@ -2,40 +2,38 @@
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
   if (!is_keyboard_master()) {
-    return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
+    return OLED_ROTATION_180;
   }
   return rotation;
 }
-
-enum layers { BASE, NUM, SYM, FUN, NAV, MEDIA, MOUSE, EXTRA };
 
 void oled_render_layer_state(void) {
   oled_write("Layer: ", false);
 
   switch (get_highest_layer(layer_state)) {
-  case BASE:
+  case _BASE:
     oled_write("Base", false);
     break;
-  case EXTRA:
+  case _NUMBERS:
+    oled_write("Numbers", false);
+    break;
+  case _EXTRA:
     oled_write("Extra", false);
     break;
-  case NAV:
+  case _FUNCTION:
+    oled_write("Function", false);
+    break;
+  case _SYMBOLS:
+    oled_write("Symbols", false);
+    break;
+  case _NAVIGATION:
     oled_write("Navigation", false);
     break;
-  case MOUSE:
-    oled_write("Mouse", false);
-    break;
-  case MEDIA:
+  case _MEDIA:
     oled_write("Media", false);
     break;
-  case NUM:
-    oled_write("Number", false);
-    break;
-  case SYM:
-    oled_write("Symbol", false);
-    break;
-  case FUN:
-    oled_write("Function", false);
+  case _QWERTY:
+    oled_write("QWERTY", false);
     break;
   }
 
