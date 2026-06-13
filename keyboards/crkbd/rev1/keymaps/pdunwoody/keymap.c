@@ -45,6 +45,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 };
 
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case LSFT_T(KC_F):
+        case RSFT_T(KC_J):
+            return true;
+        default:
+            return false;
+    }
+}
+
 enum custom_layers {
      _BASE,
      _NUMBERS,

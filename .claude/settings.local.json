@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(qmk compile *)",
+      "Bash(find /workspaces/qmk_firmware -maxdepth 4 -name \"info.json\" | xargs grep -l \"RP2040\\\\|rp2040\" 2>/dev/null | grep -i \"crkbd\\\\|corne\" | head -10)",
+      "Read(//workspaces/qmk_firmware/**)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('MCU:', d.get\\('processor','?'\\)\\); print\\('Bootloader:', d.get\\('bootloader','?'\\)\\); print\\('Features:', json.dumps\\(d.get\\('features',{}\\), indent=2\\)\\)\")",
+      "WebFetch(domain:dunwoodyengineering.com)",
+      "Bash(python3)"
+    ]
+  }
+}
