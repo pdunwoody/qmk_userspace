@@ -71,9 +71,9 @@ enum custom_layers {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_3_ex2(
-        KC_LCTL, KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,    KC_VOLD, KC_VOLU, KC_Y,    KC_U,         KC_I,         KC_O,         KC_P,            TG(7),
+        KC_LALT, KC_Q,         KC_W,         KC_E,         KC_R,         KC_T,    KC_VOLD, KC_VOLU, KC_Y,    KC_U,         KC_I,         KC_O,         KC_P,            TG(7),
         KC_LSFT, LGUI_T(KC_A), LALT_T(KC_S), LCTL_T(KC_D), LSFT_T(KC_F), KC_G,    KC_MPLY, MICMUTE, KC_H,    RSFT_T(KC_J), RCTL_T(KC_K), RALT_T(KC_L), RGUI_T(KC_SCLN), KC_QUOT,
-        KC_LALT, KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,             KC_N,    KC_M,    KC_COMM,      KC_DOT,       KC_SLSH,       KC_NO,
+        KC_LCTL, KC_Z,         KC_X,         KC_C,         KC_V,         KC_B,             KC_N,    KC_M,    KC_COMM,      KC_DOT,       KC_SLSH,       KC_NO,
         LT(3,KC_ESC), KC_SPC, LT(1,KC_TAB), LT(4,KC_ENT), LT(5,KC_BSPC), LT(6,KC_DEL)
     ),
     [_NUMBERS] = LAYOUT_split_3x6_3_ex2(
