@@ -44,7 +44,7 @@ Three keyboards are maintained, all sharing an identical 8-layer layout philosop
 |---|---|---|
 | Corne rev4.1 (standard) | `keyboards/crkbd/rev4_1/standard/keymaps/pdunwoody/` | RP2040, RGB Matrix, `LAYOUT_split_3x6_3_ex2` |
 | Corne rev1 | `keyboards/crkbd/rev1/keymaps/pdunwoody/` | RP2040, RGB Matrix + OLED, `LAYOUT_split_3x6_3` |
-| Keebio Iris CE rev1 | `keyboards/keebio/iris_ce/rev1/keymaps/pdunwoody/` | RP2040, RGB Matrix, VIA enabled, `LAYOUT` (4-row split) |
+| Keebio Iris CE rev1 | `keyboards/keebio/iris_ce/rev1/keymaps/pdunwoody/` | RP2040, RGB Matrix, `LAYOUT` (4-row split) |
 
 The `modules/getreuer/` directory is a git submodule containing getreuer's community QMK modules. All three keymaps load `getreuer/palettefx` via their `keymap.json` (`"modules": ["getreuer/palettefx"]`). PaletteFX installs its effects automatically (no `rgb_matrix_user.inc` include needed), and the default effect is `RGB_MATRIX_COMMUNITY_MODULE_PALETTEFX_FLOW` with `RGB_MATRIX_DEFAULT_HUE 96` (Synthwave palette) in each `config.h`.
 
@@ -95,11 +95,15 @@ Caps Lock / Caps Word active on `_BASE`: Gold (255, 180, 0) on all non-transpare
 
 Holding a layer key spells the layer's name once (`layer_letters`: NUM, FUNC, SYM, NAV, MEDIA) on the base-layer letter keys: the word fades up from the layer color, each letter pulses to white in turn, then the word fades back. It restarts whenever the highest active layer changes.
 
-Holding a modifier spells its name on a loop (`mod_letters`: SHFT, CTRL, ALT, WIN): each letter pulses white in turn, then a pause, with the letters held dim in between. Both effects share the `pulse_amount()` helper (uses `lib8tion`) and have their timing constants inside `rgb_matrix_indicators_advanced_user`.
+Holding a modifier spells its name on a loop (`mod_letters`: SHFT, CTRL, ALT, WIN): each letter pulses white in turn, then a pause, with the letters held dim in between.
+
+While Caps Word is on, `caps_word_letters` spells CAPS WORD on a loop over the gold the same way (a `KC_NO` entry is the gap between words). QMK doesn't sync Caps Word to the secondary half, so a user split transaction (`CAPS_WORD_SYNC`, sent from `housekeeping_task_user`) does it; indicators read `remote_caps_word` on the secondary half.
+
+All three spelling effects share the `pulse_amount()` helper (uses `lib8tion`) and have their timing constants inside `rgb_matrix_indicators_advanced_user`.
 
 ## Per-Keyboard Differences
 
-- **Iris CE rev1** has an extra number row on `_BASE` (row 0) and an additional encoder column; uses `LAYOUT` (not split_3x6_3). Also enables `VIA_ENABLE = yes`.
+- **Iris CE rev1** has an extra number row on `_BASE` (row 0) and an additional encoder column; uses `LAYOUT` (not split_3x6_3). VIA is deliberately off so `keymap.c` changes take effect on flash (VIA keeps its own EEPROM copy of the keymap).
 - **Corne rev1** includes an OLED (`oled.c`), WPM display, and uses RP2040-specific serial/pin config (`SPLIT_HAND_PIN`, `SERIAL_PIO_USE_PIO0`). `LAYER_LOCK_ENABLE` is not set in its `rules.mk` (uses the older `EE_CLR` placeholder comment).
 - **Corne rev4.1** uses `LAYOUT_split_3x6_3_ex2` (adds 2 extra columns for encoders/thumb keys in the layout macro).
 

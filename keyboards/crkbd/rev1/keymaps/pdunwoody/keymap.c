@@ -1,5 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "lib/lib8tion/lib8tion.h"
+#include "transactions.h"
 #if __has_include("keymap.h")
 #    include "keymap.h"
 #endif
@@ -121,6 +122,31 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS)
 };
 
+// QMK doesn't share Caps Word state between halves, so the primary half sends
+// it across for the secondary half's indicators.
+static bool remote_caps_word = false;
+
+static void caps_word_sync_handler(uint8_t in_len, const void *in_data, uint8_t out_len, void *out_data) {
+    remote_caps_word = *(const bool *)in_data;
+}
+
+void keyboard_post_init_user(void) {
+    transaction_register_rpc(CAPS_WORD_SYNC, caps_word_sync_handler);
+}
+
+void housekeeping_task_user(void) {
+    if (!is_keyboard_master()) return;
+    static bool     last_sent = false;
+    static uint32_t last_sync = 0;
+    bool on = is_caps_word_on();
+    if (on != last_sent || timer_elapsed32(last_sync) > 500) {
+        if (transaction_rpc_send(CAPS_WORD_SYNC, sizeof(on), &on)) {
+            last_sent = on;
+            last_sync = timer_read32();
+        }
+    }
+}
+
 // 0..255..0 over one step: a smooth "boop" used by the letter-spelling indicators.
 static uint8_t pulse_amount(uint32_t t, uint16_t step) {
     uint8_t phase = (uint32_t)t * 255 / step;
@@ -151,13 +177,48 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
     }
 
-    if (host_keyboard_led_state().caps_lock || is_caps_word_on()) {
+    bool caps_word = is_keyboard_master() ? is_caps_word_on() : remote_caps_word;
+    if (host_keyboard_led_state().caps_lock || caps_word) {
         for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
             for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
                 uint8_t index = g_led_config.matrix_co[row][col];
                 if (index >= led_min && index < led_max && index != NO_LED &&
                     keymap_key_to_keycode(0, (keypos_t){col, row}) > KC_TRNS) {
                     rgb_matrix_set_color(index, 255, 180, 0);
+                }
+            }
+        }
+    }
+
+    // Caps Word spells "CAPS WORD" on a loop over the gold: each letter pulses
+    // white in turn, a beat's gap between the words, then a pause.
+    static const uint16_t caps_word_letters[] = {KC_C, KC_A, KC_P, KC_S, KC_NO, KC_W, KC_O, KC_R, KC_D};
+    const uint16_t CAPS_WORD_STEP_MS  = 250; // time per letter (KC_NO is the gap between words)
+    const uint16_t CAPS_WORD_PAUSE_MS = 600; // gap before the sequence restarts
+    const uint8_t  CAPS_WORD_IDLE     = 60;  // letters' blend toward white between pulses
+
+    static bool     prev_caps_word  = false;
+    static uint32_t caps_word_timer = 0;
+    if (caps_word && !prev_caps_word) caps_word_timer = timer_read32(); // start on the first letter
+    prev_caps_word = caps_word;
+    if (caps_word) {
+        uint16_t pos = timer_elapsed32(caps_word_timer) % (ARRAY_SIZE(caps_word_letters) * CAPS_WORD_STEP_MS + CAPS_WORD_PAUSE_MS);
+        for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+            for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                uint8_t index = g_led_config.matrix_co[row][col];
+                if (index < led_min || index >= led_max || index == NO_LED) continue;
+                uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                if (kc == KC_NO) continue;
+                for (uint8_t i = 0; i < ARRAY_SIZE(caps_word_letters); ++i) {
+                    if (caps_word_letters[i] != kc) continue;
+                    uint8_t a = CAPS_WORD_IDLE;
+                    if (pos / CAPS_WORD_STEP_MS == i) {
+                        a = qadd8(CAPS_WORD_IDLE, scale8(pulse_amount(pos % CAPS_WORD_STEP_MS, CAPS_WORD_STEP_MS), 255 - CAPS_WORD_IDLE));
+                    }
+                    rgb_matrix_set_color(index, 255, blend8(180, 255, a), blend8(0, 255, a));
+                    break;
                 }
             }
         }
