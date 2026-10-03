@@ -93,6 +93,10 @@ All three keyboards share the same 8-layer structure and custom keycode logic. W
 
 Caps Lock / Caps Word active on `_BASE`: Gold (255, 180, 0) on all non-transparent keys.
 
+Holding a layer key spells the layer's name once (`layer_letters`: NUM, FUNC, SYM, NAV, MEDIA) on the base-layer letter keys: the word fades up from the layer color, each letter pulses to white in turn, then the word fades back. It restarts whenever the highest active layer changes.
+
+Holding a modifier spells its name on a loop (`mod_letters`: SHFT, CTRL, ALT, WIN): each letter pulses white in turn, then a pause, with the letters held dim in between. Both effects share the `pulse_amount()` helper (uses `lib8tion`) and have their timing constants inside `rgb_matrix_indicators_advanced_user`.
+
 ## Per-Keyboard Differences
 
 - **Iris CE rev1** has an extra number row on `_BASE` (row 0) and an additional encoder column; uses `LAYOUT` (not split_3x6_3). Also enables `VIA_ENABLE = yes`.

@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "lib/lib8tion/lib8tion.h"
 #if __has_include("keymap.h")
 #    include "keymap.h"
 #endif
@@ -120,6 +121,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS)
 };
 
+// 0..255..0 over one step: a smooth "boop" used by the letter-spelling indicators.
+static uint8_t pulse_amount(uint32_t t, uint16_t step) {
+    uint8_t phase = (uint32_t)t * 255 / step;
+    return sin8((uint8_t)(phase - 64));
+}
+
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     static const uint8_t layer_colors[][3] = {
         [_NUMBERS]    = {255, 200,   0},
@@ -156,8 +163,85 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
     }
 
+    // Holding a layer key shows the layer's name: the whole word fades up from
+    // the layer color, each letter pulses to white in turn, then the word fades
+    // back down.
+    static const uint16_t layer_letters[][5] = {
+        [_NUMBERS]    = {KC_N, KC_U, KC_M},
+        [_FUNCTION]   = {KC_F, KC_U, KC_N, KC_C},
+        [_SYMBOLS]    = {KC_S, KC_Y, KC_M},
+        [_NAVIGATION] = {KC_N, KC_A, KC_V},
+        [_MEDIA]      = {KC_M, KC_E, KC_D, KC_I, KC_A},
+    };
+    const uint16_t LAYER_WORD_IN_MS   = 250; // word fades up
+    const uint16_t LAYER_WORD_STEP_MS = 250; // time per letter pulse
+    const uint16_t LAYER_WORD_OUT_MS  = 400; // word fades back to the layer color
+    const uint8_t  LAYER_WORD_BASE    = 120; // word brightness between letter pulses (255 = white)
+
+    static uint8_t  prev_layer  = 0;
+    static uint32_t layer_timer = 0;
+    if (layer != prev_layer) layer_timer = timer_read32();
+    prev_layer = layer;
+    if (layer < ARRAY_SIZE(layer_letters) && layer < ARRAY_SIZE(layer_colors)) {
+        uint8_t len = 0;
+        while (len < ARRAY_SIZE(layer_letters[layer]) && layer_letters[layer][len]) ++len;
+        uint32_t t      = timer_elapsed32(layer_timer);
+        bool     show   = true;
+        uint8_t  amt    = 0;   // blend toward white for the word
+        uint8_t  active = 255; // letter currently pulsing, if any
+        uint8_t  active_amt = 0;
+        if (t < LAYER_WORD_IN_MS) {
+            amt = scale8(pulse_amount(t, 2 * LAYER_WORD_IN_MS), LAYER_WORD_BASE); // rising half of a boop
+        } else if ((t -= LAYER_WORD_IN_MS) < (uint32_t)len * LAYER_WORD_STEP_MS) {
+            amt        = LAYER_WORD_BASE;
+            active     = t / LAYER_WORD_STEP_MS;
+            active_amt = qadd8(LAYER_WORD_BASE, scale8(pulse_amount(t % LAYER_WORD_STEP_MS, LAYER_WORD_STEP_MS), 255 - LAYER_WORD_BASE));
+        } else if ((t -= (uint32_t)len * LAYER_WORD_STEP_MS) < LAYER_WORD_OUT_MS) {
+            amt = scale8(pulse_amount(t + LAYER_WORD_OUT_MS, 2 * LAYER_WORD_OUT_MS), LAYER_WORD_BASE); // falling half
+        } else {
+            show = false;
+        }
+        if (show) {
+            const uint8_t *c = layer_colors[layer];
+            for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+                for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                    uint8_t index = g_led_config.matrix_co[row][col];
+                    if (index < led_min || index >= led_max || index == NO_LED) continue;
+                    uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                    if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                    if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                    for (uint8_t i = 0; i < len; ++i) {
+                        if (layer_letters[layer][i] == kc) {
+                            uint8_t a = (i == active) ? active_amt : amt;
+                            rgb_matrix_set_color(index, blend8(c[0], 255, a), blend8(c[1], 255, a), blend8(c[2], 255, a));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Held mods spell their name on the keys: each letter pulses white in
+    // turn, then a pause before the sequence repeats (boop boop boop, pause).
+    static const uint16_t mod_letters[][4] = {
+        {KC_S, KC_H, KC_F, KC_T},
+        {KC_C, KC_T, KC_R, KC_L},
+        {KC_A, KC_L, KC_T},
+        {KC_W, KC_I, KC_N},
+    };
+    static const uint8_t mod_masks[] = {MOD_MASK_SHIFT, MOD_MASK_CTRL, MOD_MASK_ALT, MOD_MASK_GUI};
+    const uint16_t MOD_PULSE_STEP_MS  = 250; // time per letter
+    const uint16_t MOD_PULSE_PAUSE_MS = 600; // gap before the sequence restarts
+    const uint8_t  MOD_PULSE_IDLE     = 40;  // letter brightness between pulses
+
+    static uint8_t  prev_mods  = 0;
+    static uint32_t mods_timer = 0;
     uint8_t mods = get_mods();
+    if (mods && !prev_mods) mods_timer = timer_read32(); // start each hold on the first letter
+    prev_mods = mods;
     if (mods) {
+        uint32_t elapsed = timer_elapsed32(mods_timer);
         for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
             for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
                 uint8_t index = g_led_config.matrix_co[row][col];
@@ -165,12 +249,24 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                 uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
                 if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
                 if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
-                bool light = false;
-                if ((mods & MOD_MASK_SHIFT) && (kc == KC_S || kc == KC_H || kc == KC_F || kc == KC_T)) light = true;
-                if ((mods & MOD_MASK_ALT)   && (kc == KC_A || kc == KC_L || kc == KC_T))               light = true;
-                if ((mods & MOD_MASK_CTRL)  && (kc == KC_C || kc == KC_T || kc == KC_R || kc == KC_L)) light = true;
-                if ((mods & MOD_MASK_GUI)   && (kc == KC_W || kc == KC_I || kc == KC_N))               light = true;
-                if (light) rgb_matrix_set_color(index, 255, 255, 255);
+                bool    light = false;
+                uint8_t level = 0;
+                for (uint8_t m = 0; m < ARRAY_SIZE(mod_masks); ++m) {
+                    if (!(mods & mod_masks[m])) continue;
+                    uint8_t len = 0;
+                    while (len < ARRAY_SIZE(mod_letters[m]) && mod_letters[m][len]) ++len;
+                    uint16_t pos = elapsed % (len * MOD_PULSE_STEP_MS + MOD_PULSE_PAUSE_MS);
+                    for (uint8_t i = 0; i < len; ++i) {
+                        if (mod_letters[m][i] != kc) continue;
+                        uint8_t b = MOD_PULSE_IDLE;
+                        if (pos / MOD_PULSE_STEP_MS == i) {
+                            b = qadd8(MOD_PULSE_IDLE, scale8(pulse_amount(pos % MOD_PULSE_STEP_MS, MOD_PULSE_STEP_MS), 255 - MOD_PULSE_IDLE));
+                        }
+                        light = true;
+                        if (b > level) level = b;
+                    }
+                }
+                if (light) rgb_matrix_set_color(index, level, level, level);
             }
         }
     }
