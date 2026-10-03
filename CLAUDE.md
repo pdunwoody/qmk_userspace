@@ -44,9 +44,9 @@ Three keyboards are maintained, all sharing an identical 8-layer layout philosop
 |---|---|---|
 | Corne rev4.1 (standard) | `keyboards/crkbd/rev4_1/standard/keymaps/pdunwoody/` | RP2040, RGB Matrix, `LAYOUT_split_3x6_3_ex2` |
 | Corne rev1 | `keyboards/crkbd/rev1/keymaps/pdunwoody/` | RP2040, RGB Matrix + OLED, `LAYOUT_split_3x6_3` |
-| Keebio Iris CE rev1 | `keyboards/keebio/iris_ce/rev1/keymaps/pdunwoody/` | ATmega32U4, RGB Matrix, VIA enabled, `LAYOUT` (4-row split) |
+| Keebio Iris CE rev1 | `keyboards/keebio/iris_ce/rev1/keymaps/pdunwoody/` | RP2040, RGB Matrix, VIA enabled, `LAYOUT` (4-row split) |
 
-The `modules/getreuer/` directory is a git submodule containing community QMK modules (currently unused/commented out in `rgb_matrix_user.inc`).
+The `modules/getreuer/` directory is a git submodule containing getreuer's community QMK modules. All three keymaps load `getreuer/palettefx` via their `keymap.json` (`"modules": ["getreuer/palettefx"]`). PaletteFX installs its effects automatically (no `rgb_matrix_user.inc` include needed), and the default effect is `RGB_MATRIX_COMMUNITY_MODULE_PALETTEFX_FLOW` with `RGB_MATRIX_DEFAULT_HUE 96` (Synthwave palette) in each `config.h`.
 
 ## Keymap Architecture
 
@@ -95,7 +95,7 @@ Caps Lock / Caps Word active on `_BASE`: Gold (255, 180, 0) on all non-transpare
 
 ## Per-Keyboard Differences
 
-- **Iris CE rev1** has an extra number row on `_BASE` (row 0) and an additional encoder column; uses `LAYOUT` (not split_3x6_3). Also enables `VIA_ENABLE = yes` and `RGB_MATRIX_CUSTOM_USER = yes`.
+- **Iris CE rev1** has an extra number row on `_BASE` (row 0) and an additional encoder column; uses `LAYOUT` (not split_3x6_3). Also enables `VIA_ENABLE = yes`.
 - **Corne rev1** includes an OLED (`oled.c`), WPM display, and uses RP2040-specific serial/pin config (`SPLIT_HAND_PIN`, `SERIAL_PIO_USE_PIO0`). `LAYER_LOCK_ENABLE` is not set in its `rules.mk` (uses the older `EE_CLR` placeholder comment).
 - **Corne rev4.1** uses `LAYOUT_split_3x6_3_ex2` (adds 2 extra columns for encoders/thumb keys in the layout macro).
 

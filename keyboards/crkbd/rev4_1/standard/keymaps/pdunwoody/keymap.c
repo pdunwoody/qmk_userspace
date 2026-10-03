@@ -192,8 +192,3 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     }
     return false;
 }
-
-
-#ifdef OTHER_KEYMAP_C
-#    include OTHER_KEYMAP_C
-#endif // OTHER_KEYMAP_C

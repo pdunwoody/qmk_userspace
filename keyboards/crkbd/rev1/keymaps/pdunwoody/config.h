@@ -128,7 +128,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #    define ENABLE_RGB_MATRIX_SOLID_SPLASH
 #    define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 
-#    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
-#    define RGB_MATRIX_DEFAULT_HUE 34
+#    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_PALETTEFX_FLOW
+#    define RGB_MATRIX_DEFAULT_HUE 96 // PaletteFx "Synthwave" palette (RGB_MATRIX_HUE_STEP * 12)
 #    define RGB_TRIGGER_ON_KEYDOWN
 #endif

@@ -194,11 +194,6 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 }
 
 
-#ifdef OTHER_KEYMAP_C
-#    include OTHER_KEYMAP_C
-#endif // OTHER_KEYMAP_C
-
-
 #ifdef OLED_ENABLE
 #    include "oled.c"
 #endif // OLED_ENABLE
