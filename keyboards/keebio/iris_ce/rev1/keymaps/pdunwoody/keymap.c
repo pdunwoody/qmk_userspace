@@ -163,6 +163,63 @@ static uint8_t pulse_amount(uint32_t t, uint16_t step) {
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    // On power-up the keys stay dark and spell "HELLO PAUL" before the normal
+    // backlight starts: the word fades up, each letter pulses white in turn,
+    // then the word fades out and the effect takes over.
+    static const uint16_t hello_letters[] = {KC_H, KC_E, KC_L, KC_L, KC_O, KC_NO, KC_P, KC_A, KC_U, KC_L};
+    const uint16_t HELLO_DELAY_MS = 500; // dark lead-in while the halves connect
+    const uint16_t HELLO_IN_MS    = 300; // word fades up
+    const uint16_t HELLO_STEP_MS  = 250; // time per letter (KC_NO is the gap between words)
+    const uint16_t HELLO_OUT_MS   = 400; // word fades out before the backlight starts
+    const uint8_t  HELLO_BASE     = 50;  // word brightness between letter pulses
+
+    static bool hello_done = false;
+    if (!hello_done) {
+        // Time since power-up, synced from the primary half so both halves spell together.
+        uint32_t t          = sync_timer_read32();
+        uint8_t  amt        = 0;   // brightness of the word
+        uint8_t  active     = 255; // letter currently pulsing, if any
+        uint8_t  active_amt = 0;
+        if (t < HELLO_DELAY_MS) {
+            // dark
+        } else if ((t -= HELLO_DELAY_MS) < HELLO_IN_MS) {
+            amt = scale8(pulse_amount(t, 2 * HELLO_IN_MS), HELLO_BASE); // rising half of a boop
+        } else if ((t -= HELLO_IN_MS) < (uint32_t)ARRAY_SIZE(hello_letters) * HELLO_STEP_MS) {
+            amt        = HELLO_BASE;
+            active     = t / HELLO_STEP_MS;
+            active_amt = qadd8(HELLO_BASE, scale8(pulse_amount(t % HELLO_STEP_MS, HELLO_STEP_MS), 255 - HELLO_BASE));
+        } else if ((t -= (uint32_t)ARRAY_SIZE(hello_letters) * HELLO_STEP_MS) < HELLO_OUT_MS) {
+            amt = scale8(pulse_amount(t + HELLO_OUT_MS, 2 * HELLO_OUT_MS), HELLO_BASE); // falling half
+        } else {
+            hello_done = true;
+        }
+        if (!hello_done) {
+            for (uint8_t i = led_min; i < led_max; ++i) {
+                rgb_matrix_set_color(i, 0, 0, 0);
+            }
+            for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+                for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+                    uint8_t index = g_led_config.matrix_co[row][col];
+                    if (index < led_min || index >= led_max || index == NO_LED) continue;
+                    uint16_t kc = keymap_key_to_keycode(0, (keypos_t){col, row});
+                    if (IS_QK_MOD_TAP(kc))   kc = QK_MOD_TAP_GET_TAP_KEYCODE(kc);
+                    if (IS_QK_LAYER_TAP(kc)) kc = QK_LAYER_TAP_GET_TAP_KEYCODE(kc);
+                    if (kc == KC_NO) continue;
+                    // L appears more than once, so check every position before settling on a level.
+                    bool    light = false;
+                    uint8_t a     = amt;
+                    for (uint8_t i = 0; i < ARRAY_SIZE(hello_letters); ++i) {
+                        if (hello_letters[i] != kc) continue;
+                        light = true;
+                        if (i == active) a = active_amt;
+                    }
+                    if (light) rgb_matrix_set_color(index, a, a, a);
+                }
+            }
+            return false;
+        }
+    }
+
     static const uint8_t layer_colors[][3] = {
         [_NUMBERS]    = {255, 200,   0},
         [_EXTRA]      = {255,   0, 200},

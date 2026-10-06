@@ -99,7 +99,9 @@ Holding a modifier spells its name on a loop (`mod_letters`: SHFT, CTRL, ALT, WI
 
 While Caps Word is on, `caps_word_letters` spells CAPS WORD on a loop over the gold the same way (a `KC_NO` entry is the gap between words). QMK doesn't sync Caps Word to the secondary half, so a user split transaction (`CAPS_WORD_SYNC`, sent from `housekeeping_task_user`) does it; indicators read `remote_caps_word` on the secondary half.
 
-All three spelling effects share the `pulse_amount()` helper (uses `lib8tion`) and have their timing constants inside `rgb_matrix_indicators_advanced_user`.
+On power-up, the keys stay dark and spell HELLO PAUL once (`hello_letters`) before the normal effect starts: the word fades up, each letter pulses white in turn, then the word fades out (about 3.7 s total). It runs off `sync_timer_read32()` so both halves stay in step, and only plays when RGB is on.
+
+All four spelling effects share the `pulse_amount()` helper (uses `lib8tion`) and have their timing constants inside `rgb_matrix_indicators_advanced_user`.
 
 ## Per-Keyboard Differences
 
